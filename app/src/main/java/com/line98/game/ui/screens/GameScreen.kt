@@ -224,7 +224,6 @@ private fun BoardSurface(
     onCellTap: (Position) -> Unit,
 ) {
     val selectionColor = MaterialTheme.colorScheme.secondary
-    val cellSize = remember(modifier) { 0 } // placeholder to keep composable stable; size is in Row cells
 
     Surface(
         modifier = modifier,
