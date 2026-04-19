@@ -78,3 +78,27 @@ data class PowerUpCharges(
             -> rowColumnClear
         }
 }
+
+data class GameState(
+    val mode: GameMode,
+    val board: Board,
+    val score: Int,
+    val highScore: Int,
+    val nextBalls: List<BallColor>,
+    val selected: Position? = null,
+    val activePowerUp: PowerUpType? = null,
+    val charges: PowerUpCharges = PowerUpCharges(),
+    val isGameOver: Boolean = false,
+    val message: String? = null,
+) {
+    companion object {
+        fun initial(mode: GameMode): GameState =
+            GameState(
+                mode = mode,
+                board = Board.empty(),
+                score = 0,
+                highScore = 0,
+                nextBalls = listOf(BallColor.Red, BallColor.Green, BallColor.Blue),
+            )
+    }
+}
