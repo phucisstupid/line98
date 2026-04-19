@@ -53,11 +53,13 @@ class PowerUpEngine {
     ): GameState {
         val occupiedTargets = targets.count { !state.board[it].isEmpty }
         val board = targets.fold(state.board) { current, position -> current.clear(position) }
+        val score = state.score + occupiedTargets
 
         return state.copy(
             board = board,
             charges = state.charges.spend(type),
-            score = state.score + occupiedTargets,
+            score = score,
+            highScore = maxOf(state.highScore, score),
             message = null,
         )
     }
