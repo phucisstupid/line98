@@ -12,7 +12,7 @@ The first version is local-only. It does not include accounts, ads, purchases, c
 - Preserve Classic Line 98 as a clean, no-power-up mode.
 - Add a Power-up mode that extends the game without changing the core movement and clearing rules.
 - Keep game rules in plain Kotlin so they can be unit tested without Android UI.
-- Use a Clean Arcade visual direction: dark board-first UI, bright balls, compact HUD, and thumb-friendly controls.
+- Use a Clean Arcade visual direction on top of Android native UI best practices: Material 3, accessible touch targets, state-driven Compose UI, dark board-first styling, bright balls, compact HUD, and thumb-friendly controls.
 
 ## Non-Goals
 
@@ -73,7 +73,7 @@ Settings include sound and haptics toggles.
 
 ## Architecture
 
-Use a native Android Kotlin project with Jetpack Compose for UI and plain Kotlin for game rules.
+Use a native Android Kotlin project with Jetpack Compose, Material 3, AndroidX lifecycle state handling, and plain Kotlin for game rules.
 
 Core logic:
 
@@ -93,6 +93,16 @@ Compose UI:
 - Game screen.
 - Settings screen.
 - Reusable board, HUD, next-preview, and power-up bar composables.
+
+Native Android UI practices:
+
+- Use Material 3 components for menus, buttons, switches, top-level structure, dialogs, and settings.
+- Use Compose `StateFlow` collection with lifecycle awareness for screen state.
+- Keep the game board as a custom Compose drawing/composable surface because the 9x9 grid and balls are game-specific.
+- Use minimum 48dp touch targets for cells and controls where screen size permits.
+- Provide content descriptions for menu/settings controls and semantic labels for important game actions.
+- Use stable state models and unidirectional data flow from `GameViewModel` to Compose.
+- Respect dark theme defaults while applying the Clean Arcade palette.
 
 The engine should not depend on Compose, Android context, navigation, or persistence APIs.
 
