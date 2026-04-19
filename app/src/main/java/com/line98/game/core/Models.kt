@@ -77,6 +77,15 @@ data class PowerUpCharges(
             PowerUpType.ColumnClear,
             -> rowColumnClear
         }
+
+    fun spend(type: PowerUpType): PowerUpCharges =
+        when (type) {
+            PowerUpType.Bomb -> copy(bomb = (bomb - 1).coerceAtLeast(0))
+            PowerUpType.ColorChanger -> copy(colorChanger = (colorChanger - 1).coerceAtLeast(0))
+            PowerUpType.RowClear,
+            PowerUpType.ColumnClear,
+            -> copy(rowColumnClear = (rowColumnClear - 1).coerceAtLeast(0))
+        }
 }
 
 data class GameState(
