@@ -2,8 +2,11 @@ package com.line98.game.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
 private val CleanArcadeColors = darkColorScheme(
     primary = Color(0xFF35C2A1),
@@ -22,6 +25,13 @@ private val CleanArcadeColors = darkColorScheme(
 fun Line98Theme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = CleanArcadeColors,
+        shapes = Shapes(
+            extraSmall = RoundedCornerShape(4.dp),
+            small = RoundedCornerShape(8.dp),
+            medium = RoundedCornerShape(8.dp),
+            large = RoundedCornerShape(8.dp),
+            extraLarge = RoundedCornerShape(8.dp),
+        ),
         content = content,
     )
 }
