@@ -1,0 +1,29 @@
+package com.line98.game.core
+
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+
+class GameEngineTest {
+    @Test
+    fun boardStartsEmptyAndSupportsCellUpdates() {
+        val board = Board.empty()
+        val position = Position(2, 3)
+
+        assertTrue(board[position].isEmpty)
+
+        val updated = board.set(position, Cell.Occupied(BallColor.Red))
+
+        assertEquals(Cell.Occupied(BallColor.Red), updated[position])
+        assertTrue(board[position].isEmpty)
+    }
+
+    @Test
+    fun positionRejectsOutOfBoundsValues() {
+        assertFalse(Position.isValid(row = -1, col = 0))
+        assertFalse(Position.isValid(row = 9, col = 0))
+        assertFalse(Position.isValid(row = 0, col = 9))
+        assertTrue(Position.isValid(row = 8, col = 8))
+    }
+}
