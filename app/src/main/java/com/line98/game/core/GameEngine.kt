@@ -3,6 +3,18 @@ package com.line98.game.core
 class GameEngine(
     private val random: RandomSource = KotlinRandomSource(),
 ) {
+    fun newGame(mode: GameMode, highScore: Int = 0): GameState {
+        val previewBalls = generateNextBalls()
+        val initialSpawn = generateNextBalls()
+        val spawned = spawnBalls(Board.empty(), initialSpawn)
+
+        return GameState.initial(mode).copy(
+            board = spawned.board,
+            highScore = highScore,
+            nextBalls = previewBalls,
+        )
+    }
+
     fun hasPath(board: Board, from: Position, to: Position): Boolean {
         if (from == to || board[from].isEmpty || !board[to].isEmpty) return false
 
@@ -40,7 +52,13 @@ class GameEngine(
             board = clearPositions(board, cleared)
             score += cleared.size * 2
         } else {
-            board = spawnBalls(board, state.nextBalls)
+            val spawned = spawnBalls(board, state.nextBalls)
+            board = spawned.board
+            val spawnedCleared = spawned.positions.flatMap { findLines(board, it) }.toSet()
+            if (spawnedCleared.isNotEmpty()) {
+                board = clearPositions(board, spawnedCleared)
+                score += spawnedCleared.size * 2
+            }
         }
 
         return state.copy(
@@ -71,31 +89,52 @@ class GameEngine(
         return result
     }
 
-    fun spawnBalls(board: Board, colors: List<BallColor>): Board {
+    private data class SpawnResult(
+        val board: Board,
+        val positions: List<Position>,
+    )
+
+    private fun spawnBalls(board: Board, colors: List<BallColor>): SpawnResult {
         var current = board
+        val positions = mutableListOf<Position>()
         for (color in colors) {
             val emptyPositions = current.emptyPositions()
-            if (emptyPositions.isEmpty()) return current
+            if (emptyPositions.isEmpty()) return SpawnResult(current, positions)
 
-            val preferredIndex = random.nextInt(Position.Size * Position.Size)
+            val preferredIndex = nextRandomInt(
+                bound = Position.Size * Position.Size,
+                context = "spawn position",
+            )
             val preferred = Position(preferredIndex / Position.Size, preferredIndex % Position.Size)
             val chosen = if (current[preferred].isEmpty) {
                 preferred
             } else {
-                emptyPositions[random.nextInt(emptyPositions.size)]
+                emptyPositions[nextRandomInt(emptyPositions.size, "spawn fallback")]
             }
 
             current = current.set(chosen, Cell.Occupied(color))
+            positions.add(chosen)
         }
 
-        return current
+        return SpawnResult(current, positions)
     }
 
     private fun generateNextBalls(): List<BallColor> =
-        List(3) { BallColor.entries[random.nextInt(BallColor.entries.size)] }
+        List(3) {
+            BallColor.entries[nextRandomInt(BallColor.entries.size, "ball color")]
+        }
 
     private fun clearPositions(board: Board, positions: Set<Position>): Board =
         positions.fold(board) { current, position -> current.clear(position) }
+
+    private fun nextRandomInt(bound: Int, context: String): Int {
+        require(bound > 0) { "$context bound must be positive, was $bound" }
+        val value = random.nextInt(bound)
+        require(value in 0 until bound) {
+            "$context returned invalid value $value for bound $bound"
+        }
+        return value
+    }
 
     private fun walk(
         board: Board,
