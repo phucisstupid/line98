@@ -47,10 +47,12 @@ class GameEngine(
         var board = state.board.clear(from).set(to, movingCell)
         val cleared = findLines(board, to)
         var score = state.score
+        var charges = state.charges
 
         if (cleared.isNotEmpty()) {
             board = clearPositions(board, cleared)
             score += cleared.size * 2
+            charges = charges.awardForClear(state.mode, cleared.size)
         } else {
             val spawned = spawnBalls(board, state.nextBalls)
             board = spawned.board
@@ -58,6 +60,7 @@ class GameEngine(
             if (spawnedCleared.isNotEmpty()) {
                 board = clearPositions(board, spawnedCleared)
                 score += spawnedCleared.size * 2
+                charges = charges.awardForClear(state.mode, spawnedCleared.size)
             }
         }
 
@@ -65,6 +68,7 @@ class GameEngine(
             board = board,
             score = score,
             highScore = maxOf(state.highScore, score),
+            charges = charges,
             nextBalls = generateNextBalls(),
             selected = null,
             isGameOver = board.isFull(),
@@ -126,6 +130,19 @@ class GameEngine(
 
     private fun clearPositions(board: Board, positions: Set<Position>): Board =
         positions.fold(board) { current, position -> current.clear(position) }
+
+    private fun PowerUpCharges.awardForClear(mode: GameMode, clearedCount: Int): PowerUpCharges {
+        if (mode != GameMode.PowerUp || clearedCount <= 0) return this
+
+        var updated = copy(bomb = bomb + 1)
+        if (clearedCount >= 6) {
+            updated = updated.copy(colorChanger = updated.colorChanger + 1)
+        }
+        if (clearedCount >= 7) {
+            updated = updated.copy(rowColumnClear = updated.rowColumnClear + 1)
+        }
+        return updated
+    }
 
     private fun nextRandomInt(bound: Int, context: String): Int {
         require(bound > 0) { "$context bound must be positive, was $bound" }

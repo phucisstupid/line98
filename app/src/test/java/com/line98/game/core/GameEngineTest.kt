@@ -105,6 +105,68 @@ class GameEngineTest {
     }
 
     @Test
+    fun powerUpModeAwardsBombChargeForAnyClear() {
+        val engine = GameEngine(FixedRandomSource(listOf(Position(8, 8), Position(8, 7), Position(8, 6))))
+        val state = GameState.initial(GameMode.PowerUp).copy(
+            board = Board.empty()
+                .set(Position(0, 0), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 1), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 2), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 3), Cell.Occupied(BallColor.Red))
+                .set(Position(2, 0), Cell.Occupied(BallColor.Red)),
+            nextBalls = listOf(BallColor.Blue, BallColor.Green, BallColor.Yellow),
+            charges = PowerUpCharges(),
+        )
+
+        val result = engine.move(state, Position(2, 0), Position(0, 4))
+
+        assertEquals(PowerUpCharges(bomb = 1), result.charges)
+    }
+
+    @Test
+    fun powerUpModeAwardsHigherChargesForLargeClear() {
+        val engine = GameEngine(FixedRandomSource(listOf(Position(8, 8), Position(8, 7), Position(8, 6))))
+        val state = GameState.initial(GameMode.PowerUp).copy(
+            board = Board.empty()
+                .set(Position(0, 0), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 1), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 2), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 3), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 4), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 5), Cell.Occupied(BallColor.Red))
+                .set(Position(2, 0), Cell.Occupied(BallColor.Red)),
+            nextBalls = listOf(BallColor.Blue, BallColor.Green, BallColor.Yellow),
+            charges = PowerUpCharges(),
+        )
+
+        val result = engine.move(state, Position(2, 0), Position(0, 6))
+
+        assertEquals(
+            PowerUpCharges(bomb = 1, colorChanger = 1, rowColumnClear = 1),
+            result.charges,
+        )
+    }
+
+    @Test
+    fun classicModeDoesNotAwardChargesForClear() {
+        val engine = GameEngine(FixedRandomSource(listOf(Position(8, 8), Position(8, 7), Position(8, 6))))
+        val state = GameState.initial(GameMode.Classic).copy(
+            board = Board.empty()
+                .set(Position(0, 0), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 1), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 2), Cell.Occupied(BallColor.Red))
+                .set(Position(0, 3), Cell.Occupied(BallColor.Red))
+                .set(Position(2, 0), Cell.Occupied(BallColor.Red)),
+            nextBalls = listOf(BallColor.Blue, BallColor.Green, BallColor.Yellow),
+            charges = PowerUpCharges(bomb = 2, colorChanger = 1, rowColumnClear = 3),
+        )
+
+        val result = engine.move(state, Position(2, 0), Position(0, 4))
+
+        assertEquals(state.charges, result.charges)
+    }
+
+    @Test
     fun spawnedLinesAreClearedAndCanPreventGameOver() {
         val engine = GameEngine(FixedRandomSource(listOf(Position(0, 5), Position(0, 3), Position(0, 4))))
         val state = GameState.initial(GameMode.Classic).copy(
