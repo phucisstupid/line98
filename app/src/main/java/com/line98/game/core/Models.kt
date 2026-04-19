@@ -63,6 +63,12 @@ data class PowerUpCharges(
     val colorChanger: Int = 0,
     val rowColumnClear: Int = 0,
 ) {
+    init {
+        require(bomb >= 0) { "Bomb charges cannot be negative" }
+        require(colorChanger >= 0) { "Color changer charges cannot be negative" }
+        require(rowColumnClear >= 0) { "Row/column clear charges cannot be negative" }
+    }
+
     fun count(type: PowerUpType): Int =
         when (type) {
             PowerUpType.Bomb -> bomb
@@ -72,4 +78,3 @@ data class PowerUpCharges(
             -> rowColumnClear
         }
 }
-
