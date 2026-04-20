@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.line98.game.core.BallColor
+import com.line98.game.core.Board
 import com.line98.game.core.Cell
 import com.line98.game.core.GameEngine
 import com.line98.game.core.GameMode
@@ -132,7 +133,11 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             PowerUpType.ColorChanger -> {
                 val cell = game.board[position]
                 if (cell is Cell.Occupied) {
-                    powerUpEngine.applyColorChanger(game, position, nextBallColor(cell.color))
+                    powerUpEngine.applyColorChanger(
+                        game,
+                        position,
+                        strategicColorChange(game.board, position),
+                    )
                 } else {
                     powerUpEngine.applyColorChanger(game, position, BallColor.Red)
                 }
@@ -168,10 +173,54 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun nextBallColor(color: BallColor): BallColor {
-        val colors = BallColor.entries
-        val currentIndex = colors.indexOf(color)
-        val nextIndex = (currentIndex + 1) % colors.size
-        return colors[nextIndex]
+    private fun strategicColorChange(board: Board, position: Position): BallColor {
+        val currentColor = (board[position] as? Cell.Occupied)?.color
+            ?: return BallColor.Red
+
+        var bestColor: BallColor? = null
+        var bestLength = -1
+
+        for (candidate in BallColor.entries) {
+            if (candidate == currentColor) continue
+
+            val length = lineLengthThrough(board, position, candidate)
+            if (length > bestLength) {
+                bestColor = candidate
+                bestLength = length
+            }
+        }
+
+        return bestColor ?: BallColor.Red
+    }
+
+    private fun lineLengthThrough(board: Board, origin: Position, color: BallColor): Int {
+        val directions = listOf(0 to 1, 1 to 0, 1 to 1, 1 to -1)
+        return directions.maxOf { (rowDelta, colDelta) ->
+            1 +
+                lineExtension(board, origin, color, rowDelta, colDelta) +
+                lineExtension(board, origin, color, -rowDelta, -colDelta)
+        }
+    }
+
+    private fun lineExtension(
+        board: Board,
+        origin: Position,
+        color: BallColor,
+        rowDelta: Int,
+        colDelta: Int,
+    ): Int {
+        var row = origin.row + rowDelta
+        var col = origin.col + colDelta
+        var length = 0
+
+        while (Position.isValid(row, col)) {
+            val cell = board[Position(row, col)]
+            if (cell != Cell.Occupied(color)) break
+            length++
+            row += rowDelta
+            col += colDelta
+        }
+
+        return length
     }
 }

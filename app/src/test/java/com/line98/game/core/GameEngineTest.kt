@@ -105,6 +105,26 @@ class GameEngineTest {
     }
 
     @Test
+    fun clearingFiveInLineKeepsExistingPreviewWhenNoSpawnOccurs() {
+        val engine = GameEngine(FixedRandomSource(listOf(Position(8, 8), Position(8, 7), Position(8, 6))))
+        val baseBoard = Board.empty()
+            .set(Position(0, 0), Cell.Occupied(BallColor.Red))
+            .set(Position(0, 1), Cell.Occupied(BallColor.Red))
+            .set(Position(0, 2), Cell.Occupied(BallColor.Red))
+            .set(Position(0, 3), Cell.Occupied(BallColor.Red))
+            .set(Position(2, 0), Cell.Occupied(BallColor.Red))
+        val preview = listOf(BallColor.Blue, BallColor.Green, BallColor.Yellow)
+        val state = GameState.initial(GameMode.Classic).copy(
+            board = baseBoard,
+            nextBalls = preview,
+        )
+
+        val result = engine.move(state, Position(2, 0), Position(0, 4))
+
+        assertEquals(preview, result.nextBalls)
+    }
+
+    @Test
     fun powerUpModeAwardsBombChargeForAnyClear() {
         val engine = GameEngine(FixedRandomSource(listOf(Position(8, 8), Position(8, 7), Position(8, 6))))
         val state = GameState.initial(GameMode.PowerUp).copy(

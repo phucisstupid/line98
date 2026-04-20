@@ -2,6 +2,7 @@ package com.line98.game.ui.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ private val GridCellColor = Color(0xFF1A1D22)
 private val GridSelectedColor = Color(0xFF2F3742)
 private val GridReachableColor = Color(0xFF203D33)
 private val GridBallHighlight = Color.White.copy(alpha = 0.25f)
+private val MaxBoardContentWidth = 432.dp
 
 @Composable
 fun GameScreen(
@@ -67,6 +69,7 @@ fun GameScreen(
 ) {
     val boardEngine = remember { GameEngine() }
     val scrollState = rememberScrollState()
+    val blockedPath = state.message == "Blocked path"
     val reachableTargets = remember(state.board, state.selected) {
         val selected = state.selected ?: return@remember emptySet()
         state.board.positions()
@@ -84,7 +87,7 @@ fun GameScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            val contentWidth = (maxWidth - 24.dp).coerceAtMost(420.dp)
+            val contentWidth = (maxWidth - 24.dp).coerceAtMost(MaxBoardContentWidth)
 
             Column(
                 modifier = Modifier
@@ -122,6 +125,7 @@ fun GameScreen(
                 BoardSurface(
                     state = state,
                     reachableTargets = reachableTargets,
+                    blockedPath = blockedPath,
                     modifier = Modifier.size(contentWidth),
                     onCellTap = onCellTap,
                 )
@@ -220,13 +224,21 @@ private fun TopHud(
 private fun BoardSurface(
     state: GameState,
     reachableTargets: Set<Position>,
+    blockedPath: Boolean,
     modifier: Modifier = Modifier,
     onCellTap: (Position) -> Unit,
 ) {
-    val selectionColor = MaterialTheme.colorScheme.secondary
+    val selectionColor =
+        if (blockedPath) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    val boardModifier =
+        if (blockedPath) {
+            modifier.border(2.dp, MaterialTheme.colorScheme.error, MaterialTheme.shapes.medium)
+        } else {
+            modifier
+        }
 
     Surface(
-        modifier = modifier,
+        modifier = boardModifier,
         color = BoardSurfaceColor,
         shape = MaterialTheme.shapes.medium,
     ) {

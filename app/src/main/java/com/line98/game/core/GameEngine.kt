@@ -48,6 +48,7 @@ class GameEngine(
         val cleared = findLines(board, to)
         var score = state.score
         var charges = state.charges
+        var nextBalls = state.nextBalls
 
         if (cleared.isNotEmpty()) {
             board = clearPositions(board, cleared)
@@ -62,6 +63,7 @@ class GameEngine(
                 score += spawnedCleared.size * 2
                 charges = charges.awardForClear(state.mode, spawnedCleared.size)
             }
+            nextBalls = generateNextBalls()
         }
 
         return state.copy(
@@ -69,7 +71,7 @@ class GameEngine(
             score = score,
             highScore = maxOf(state.highScore, score),
             charges = charges,
-            nextBalls = generateNextBalls(),
+            nextBalls = nextBalls,
             selected = null,
             isGameOver = board.isFull(),
             message = null,
