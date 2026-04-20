@@ -2,3 +2,20 @@
 .worktrees/
 .gradle/
 build/
+
+# Android and Gradle build output
+**/build/
+local.properties
+
+# IDE and editor state
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+
+# Signing and release secrets
+*.jks
+*.keystore
+keystore.properties
