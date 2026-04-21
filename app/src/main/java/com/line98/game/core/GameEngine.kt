@@ -80,10 +80,11 @@ class GameEngine(
 
     fun findLines(board: Board, origin: Position): Set<Position> {
         val cell = board[origin] as? Cell.Occupied ?: return emptySet()
-        val directions = listOf(0 to 1, 1 to 0, 1 to 1, 1 to -1)
         val result = mutableSetOf<Position>()
 
-        for ((dr, dc) in directions) {
+        for (i in DIRECTIONS.indices step 2) {
+            val dr = DIRECTIONS[i]
+            val dc = DIRECTIONS[i+1]
             val line = mutableSetOf(origin)
             line.addAll(walk(board, origin, cell.color, dr, dc))
             line.addAll(walk(board, origin, cell.color, -dr, -dc))
@@ -175,5 +176,9 @@ class GameEngine(
         }
 
         return result
+    }
+
+    companion object {
+        private val DIRECTIONS = intArrayOf(0, 1, 1, 0, 1, 1, 1, -1)
     }
 }
