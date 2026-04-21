@@ -11,10 +11,8 @@ data class Position(val row: Int, val col: Int) {
             row + 1 to col,
             row to col - 1,
             row to col + 1,
-        ).filter { (neighborRow, neighborCol) ->
-            isValid(neighborRow, neighborCol)
-        }.map { (neighborRow, neighborCol) ->
-            Position(neighborRow, neighborCol)
+        ).mapNotNull { (neighborRow, neighborCol) ->
+            if (isValid(neighborRow, neighborCol)) Position(neighborRow, neighborCol) else null
         }
 
     companion object {
