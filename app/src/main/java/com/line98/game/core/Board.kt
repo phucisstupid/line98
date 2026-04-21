@@ -13,10 +13,7 @@ data class Board private constructor(
     fun clear(position: Position): Board =
         set(position, Cell.Empty)
 
-    fun positions(): List<Position> =
-        List(Position.Size * Position.Size) { index ->
-            Position(index / Position.Size, index % Position.Size)
-        }
+    fun positions(): List<Position> = ALL_POSITIONS
 
     fun emptyPositions(): List<Position> =
         positions().filter { this[it].isEmpty }
@@ -31,6 +28,11 @@ data class Board private constructor(
         position.row * Position.Size + position.col
 
     companion object {
+        private val ALL_POSITIONS: List<Position> =
+            List(Position.Size * Position.Size) { index ->
+                Position(index / Position.Size, index % Position.Size)
+            }
+
         fun empty(): Board =
             Board(List(Position.Size * Position.Size) { Cell.Empty })
     }
