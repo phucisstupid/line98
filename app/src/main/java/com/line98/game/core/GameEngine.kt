@@ -103,8 +103,8 @@ class GameEngine(
     private fun spawnBalls(board: Board, colors: List<BallColor>): SpawnResult {
         var current = board
         val positions = mutableListOf<Position>()
+        val emptyPositions = current.emptyPositions().toMutableList()
         for (color in colors) {
-            val emptyPositions = current.emptyPositions()
             if (emptyPositions.isEmpty()) return SpawnResult(current, positions)
 
             val preferredIndex = nextRandomInt(
@@ -118,6 +118,7 @@ class GameEngine(
                 emptyPositions[nextRandomInt(emptyPositions.size, "spawn fallback")]
             }
 
+            emptyPositions.remove(chosen)
             current = current.set(chosen, Cell.Occupied(color))
             positions.add(chosen)
         }
