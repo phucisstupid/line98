@@ -5,17 +5,14 @@ data class Position(val row: Int, val col: Int) {
         require(isValid(row, col)) { "Position out of bounds: row=$row col=$col" }
     }
 
-    fun neighbors(): List<Position> =
-        listOf(
-            row - 1 to col,
-            row + 1 to col,
-            row to col - 1,
-            row to col + 1,
-        ).filter { (neighborRow, neighborCol) ->
-            isValid(neighborRow, neighborCol)
-        }.map { (neighborRow, neighborCol) ->
-            Position(neighborRow, neighborCol)
-        }
+    fun neighbors(): List<Position> {
+        val result = ArrayList<Position>(4)
+        if (isValid(row - 1, col)) result.add(Position(row - 1, col))
+        if (isValid(row + 1, col)) result.add(Position(row + 1, col))
+        if (isValid(row, col - 1)) result.add(Position(row, col - 1))
+        if (isValid(row, col + 1)) result.add(Position(row, col + 1))
+        return result
+    }
 
     companion object {
         const val Size = 9
