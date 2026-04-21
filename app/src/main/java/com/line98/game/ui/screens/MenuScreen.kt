@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.line98.game.core.GameMode
 import com.line98.game.data.UserSettings
+import com.line98.game.ui.displayName
 
 @Composable
 fun MenuScreen(
@@ -93,9 +94,3 @@ fun MenuScreen(
         }
     }
 }
-
-private fun GameMode.displayName(): String =
-    when (this) {
-        GameMode.Classic -> "Classic"
-        GameMode.PowerUp -> "Power-up"
-    }

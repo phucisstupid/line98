@@ -50,6 +50,7 @@ import com.line98.game.core.GameEngine
 import com.line98.game.core.GameMode
 import com.line98.game.core.GameState
 import com.line98.game.core.Position
+import com.line98.game.ui.displayName
 import com.line98.game.core.PowerUpType
 
 private val BoardSurfaceColor = Color(0xFF111317)
@@ -505,16 +506,3 @@ private fun BallColor.toComposeColor(): Color =
 private fun Color.darker(amount: Float): Color =
     Color(red * (1f - amount), green * (1f - amount), blue * (1f - amount), alpha)
 
-private fun GameMode.displayName(): String =
-    when (this) {
-        GameMode.Classic -> "Classic"
-        GameMode.PowerUp -> "Power-up"
-    }
-
-private fun PowerUpType.displayName(): String =
-    when (this) {
-        PowerUpType.Bomb -> "Bomb"
-        PowerUpType.ColorChanger -> "Color changer"
-        PowerUpType.RowClear -> "Row clear"
-        PowerUpType.ColumnClear -> "Column clear"
-    }
